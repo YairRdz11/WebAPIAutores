@@ -10,6 +10,5 @@ namespace WebAPIAutores.Entities
         [StringLength(maximumLength: 120, ErrorMessage = "The field {0} must not have more than {1} charecters")]
         [CamelCaseValidation]
         public string Name { get; set; }
-        public List<Book> Books { get; set; }
     }
 }
