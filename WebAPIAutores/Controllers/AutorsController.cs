@@ -23,6 +23,11 @@ namespace WebAPIAutores.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(Autor autor)
         {
+            var autorExisted = await context.Autors.AnyAsync(x => x.Name.ToLower() == autor.Name.ToLower());
+            if(autorExisted)
+            {
+                return BadRequest($"The autor {autor.Name} already exists");
+            }
             context.Add(autor);
 
             await context.SaveChangesAsync();
