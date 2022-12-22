@@ -38,6 +38,14 @@ namespace WebAPIAutores.Controllers
             return autor;
         }
 
+        [HttpGet("{name}")]
+        public async Task<ActionResult<List<Autor>>> Get(string name)
+        {
+            var autors = await context.Autors.Where(x => x.Name.Contains(name)).ToListAsync();
+
+            return autors;
+        }
+
         [HttpPost]
         public async Task<ActionResult> Post(AutorCreationDTO autorCreationDTO)
         {
