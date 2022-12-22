@@ -9,6 +9,7 @@ namespace WebAPIAutores.Utilities
         public AutomapperProfiles()
         {
             CreateMap<AutorCreationDTO, Autor>();
+            CreateMap<Autor, AutorDTO>();
         }
     }
 }
