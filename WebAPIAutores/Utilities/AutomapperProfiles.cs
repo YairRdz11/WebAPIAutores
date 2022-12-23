@@ -10,6 +10,9 @@ namespace WebAPIAutores.Utilities
         {
             CreateMap<AutorCreationDTO, Autor>();
             CreateMap<Autor, AutorDTO>();
+
+            CreateMap<BookCreationDTO, Book>();
+            CreateMap<Book, BookDTO>();
         }
     }
 }

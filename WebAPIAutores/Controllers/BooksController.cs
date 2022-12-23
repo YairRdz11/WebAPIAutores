@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebAPIAutores.DTOs;
 using WebAPIAutores.Entities;
 
 namespace WebAPIAutores.Controllers
@@ -9,31 +11,35 @@ namespace WebAPIAutores.Controllers
     public class BooksController : ControllerBase
     {
         private readonly ApplicationDBContext context;
+        private readonly IMapper mapper;
 
-        public BooksController(ApplicationDBContext context)
+        public BooksController(ApplicationDBContext context, IMapper mapper)
         {
             this.context = context;
+            this.mapper = mapper;
         }
 
-        //[HttpGet("{id:int}")]
-        //public async Task<ActionResult<Book>> Get(int id)
-        //{
-        //    return await context.Books.Include(x => x.Autor).FirstOrDefaultAsync(x => x.Id == id);
-        //}
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<BookDTO>> Get(int id)
+        {
+            var book = await context.Books.FirstOrDefaultAsync(x => x.Id == id);
 
-        //[HttpPost]
-        //public async Task<ActionResult> Post(Book book)
-        //{
-        //    var autorExisted = await context.Autors.AnyAsync(x => x.Id == book.AutorId);
-        //    if (!autorExisted)
-        //    {
-        //        return BadRequest($"Autor id not found of: {book.AutorId}");
-        //    }
+            return mapper.Map<BookDTO>(book);
+        }
 
-        //    context.Add(book);
-        //    await context.SaveChangesAsync();
+        [HttpPost]
+        public async Task<ActionResult> Post(BookCreationDTO bookCreationDto)
+        {
+            //var autorExisted = await context.Autors.AnyAsync(x => x.Id == book.AutorId);
+            //if (!autorExisted)
+            //{
+            //    return BadRequest($"Autor id not found of: {book.AutorId}");
+            //}
+            var book = mapper.Map<Book>(bookCreationDto);
+            context.Add(book);
+            await context.SaveChangesAsync();
 
-        //    return Ok();
-        //}
+            return Ok();
+        }
     }
 }
