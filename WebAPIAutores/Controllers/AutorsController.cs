@@ -27,7 +27,7 @@ namespace WebAPIAutores.Controllers
             return mapper.Map<List<AutorDTO>>(autors);
         }
 
-        [HttpGet("{id:int")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<AutorDTO>> Get(int id)
         {
             var autor = await context.Autors.FirstOrDefaultAsync(x => x.Id == id);
