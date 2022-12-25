@@ -13,10 +13,28 @@ namespace WebAPIAutores.Utilities
 
             CreateMap<BookCreationDTO, Book>()
                 .ForMember(x => x.AutorsBooks, options => options.MapFrom(MapAutorsBook));
-            CreateMap<Book, BookDTO>();
+            CreateMap<Book, BookDTO>()
+                .ForMember(x=>x.Autors, options => options.MapFrom(MapBookDTOAutors));
 
             CreateMap<CommentCreationDTO, Comment>();
             CreateMap<Comment, CommentDTO>();
+        }
+
+        private List<AutorDTO> MapBookDTOAutors(Book book, BookDTO bookDTO)
+        {
+            var result = new List<AutorDTO>();
+
+            if(book.AutorsBooks == null)
+            {
+                return result;
+            }
+
+            foreach(var autorBook in book.AutorsBooks)
+            {
+                result.Add(new AutorDTO() { Id = autorBook.AutorId, Name = autorBook.Autor.Name });
+            }
+
+            return result;
         }
 
         private List<AutorBook> MapAutorsBook(BookCreationDTO bookCreationDTO, Book book)

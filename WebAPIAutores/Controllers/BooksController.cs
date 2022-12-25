@@ -23,7 +23,11 @@ namespace WebAPIAutores.Controllers
         public async Task<ActionResult<BookDTO>> Get(int id)
         {
             var book = await context.Books
+                .Include(x => x.AutorsBooks)
+                .ThenInclude(x => x.Autor)
                 .FirstOrDefaultAsync(x => x.Id == id);
+
+            book.AutorsBooks = book.AutorsBooks.OrderBy(x => x.Order).ToList();
 
             return mapper.Map<BookDTO>(book);
         }
