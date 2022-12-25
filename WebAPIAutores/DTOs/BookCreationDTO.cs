@@ -8,5 +8,6 @@ namespace WebAPIAutores.DTOs
         [CamelCaseValidation]
         [StringLength(maximumLength: 250)]
         public string Title { get; set; }
+        public List<int> AutorIds { get; set; }
     }
 }
