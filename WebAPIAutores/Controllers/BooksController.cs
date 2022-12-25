@@ -46,6 +46,15 @@ namespace WebAPIAutores.Controllers
             }
 
             var book = mapper.Map<Book>(bookCreationDto);
+
+            if(book.AutorsBooks != null)
+            {
+                for(int i = 0; i < book.AutorsBooks.Count; i++)
+                {
+                    book.AutorsBooks[i].Order = i;
+                }
+            }
+
             context.Add(book);
             await context.SaveChangesAsync();
 
