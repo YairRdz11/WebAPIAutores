@@ -11,5 +11,6 @@ namespace WebAPIAutores.Entities
         [StringLength(maximumLength: 250)]
         public string Title { get; set; }
         public List<Comment> Comments { get; set; }
+        public List<AutorBook> AutorsBooks { get; set; }
     }
 }
