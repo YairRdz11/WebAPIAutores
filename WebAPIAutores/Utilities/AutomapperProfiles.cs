@@ -9,7 +9,8 @@ namespace WebAPIAutores.Utilities
         public AutomapperProfiles()
         {
             CreateMap<AutorCreationDTO, Autor>();
-            CreateMap<Autor, AutorDTO>();
+            CreateMap<Autor, AutorDTO>()
+                .ForMember(x => x.Books, options => options.MapFrom(MapAutorDTOBooks));
 
             CreateMap<BookCreationDTO, Book>()
                 .ForMember(x => x.AutorsBooks, options => options.MapFrom(MapAutorsBook));
@@ -18,6 +19,23 @@ namespace WebAPIAutores.Utilities
 
             CreateMap<CommentCreationDTO, Comment>();
             CreateMap<Comment, CommentDTO>();
+        }
+
+        private List<BookDTO> MapAutorDTOBooks(Autor autor, AutorDTO autorDTO)
+        {
+            var result = new List<BookDTO>();
+
+            if (autor.AutorsBooks == null)
+            {
+                return result;
+            }
+
+            foreach (var autorBook in autor.AutorsBooks)
+            {
+                result.Add(new BookDTO() { Id = autorBook.BookId, Title = autorBook.Book.Title });
+            }
+
+            return result;
         }
 
         private List<AutorDTO> MapBookDTOAutors(Book book, BookDTO bookDTO)
