@@ -28,6 +28,11 @@ namespace WebAPIAutores.Controllers
                 .ThenInclude(x => x.Autor)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
+            if(book == null)
+            {
+                return NotFound();
+            }
+
             book.AutorsBooks = book.AutorsBooks.OrderBy(x => x.Order).ToList();
 
             return mapper.Map<BookDTOWithAutors>(book);
@@ -108,6 +113,21 @@ namespace WebAPIAutores.Controllers
             mapper.Map(bookDTO, bookDB);
             await context.SaveChangesAsync();
 
+            return NoContent();
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var bookExisted = await context.Books.AnyAsync(x => x.Id == id);
+            if (!bookExisted)
+            {
+                return NotFound();
+            }
+
+            context.Remove(new Book { Id = id });
+
+            await context.SaveChangesAsync();
             return NoContent();
         }
 
