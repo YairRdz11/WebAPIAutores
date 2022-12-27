@@ -16,7 +16,8 @@ namespace WebAPIAutores
             // Add services to the container.
 
             services.AddControllers()
-                .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+                .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
+                .AddNewtonsoftJson();
 
             services.AddDbContext<ApplicationDBContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"))

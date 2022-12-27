@@ -10,6 +10,7 @@ namespace WebAPIAutores.Entities
         [CamelCaseValidation]
         [StringLength(maximumLength: 250)]
         public string Title { get; set; }
+        public DateTime? PublishDate { get; set; }
         public List<Comment> Comments { get; set; }
         public List<AutorBook> AutorsBooks { get; set; }
     }
