@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata.Ecma335;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WebAPIAutores.Entities;
 
 namespace WebAPIAutores
 {
-    public class ApplicationDBContext : DbContext
+    public class ApplicationDBContext : IdentityDbContext
     {
         public DbSet<Autor> Autors { get; set; }
         public DbSet<Book> Books { get; set; }

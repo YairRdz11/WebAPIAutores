@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
 namespace WebAPIAutores
@@ -23,11 +25,17 @@ namespace WebAPIAutores
                 options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"))
             );
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
             services.AddAutoMapper(typeof(Startup));
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDBContext>()
+                .AddDefaultTokenProviders();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
