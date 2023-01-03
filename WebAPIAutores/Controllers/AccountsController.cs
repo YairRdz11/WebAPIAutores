@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -56,6 +58,20 @@ namespace WebAPIAutores.Controllers
             }
         }
 
+        [HttpGet("renovate-token")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public ActionResult<ResponseAuthentication> Renovate()
+        {
+            var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
+            var email = emailClaim.Value;
+            var userCredentials = new UserCredentials()
+            {
+                Email = email
+            };
+
+            return BuildToken(userCredentials);
+        }
+
         private ResponseAuthentication BuildToken(UserCredentials userCredential)
         {
             var claims = new List<Claim>()
@@ -66,7 +82,7 @@ namespace WebAPIAutores.Controllers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["keyjwt"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var expiration = DateTime.UtcNow.AddYears(1);
+            var expiration = DateTime.UtcNow.AddMinutes(30);
 
             var securiyToken = new JwtSecurityToken(issuer: null, audience: null, claims: claims, expires: expiration, signingCredentials: creds);
 
