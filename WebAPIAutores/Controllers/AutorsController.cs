@@ -10,7 +10,7 @@ namespace WebAPIAutores.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isAdmin")]
     public class AutorsController : ControllerBase
     {
         private readonly ApplicationDBContext context;
