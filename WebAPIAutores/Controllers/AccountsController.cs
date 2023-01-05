@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Validations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -35,7 +36,7 @@ namespace WebAPIAutores.Controllers
 
             if (result.Succeeded)
             {
-                return BuildToken(userCredential);
+                return await BuildToken(userCredential);
             } 
             else
             {
@@ -50,7 +51,7 @@ namespace WebAPIAutores.Controllers
 
             if (result.Succeeded)
             {
-                return BuildToken(userCredentials);
+                return await BuildToken(userCredentials);
             }
             else
             {
@@ -60,7 +61,7 @@ namespace WebAPIAutores.Controllers
 
         [HttpGet("renovate-token")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public ActionResult<ResponseAuthentication> Renovate()
+        public async Task<ActionResult<ResponseAuthentication>> Renovate()
         {
             var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
             var email = emailClaim.Value;
@@ -69,15 +70,38 @@ namespace WebAPIAutores.Controllers
                 Email = email
             };
 
-            return BuildToken(userCredentials);
+            return await BuildToken(userCredentials);
         }
 
-        private ResponseAuthentication BuildToken(UserCredentials userCredential)
+        [HttpPost("get-admin")]
+        public async Task<ActionResult> GetAdmin(EditAdminDTO editAdminDTO)
+        {
+            var user = await userManager.FindByEmailAsync(editAdminDTO.Email);
+            await userManager.AddClaimAsync(user, new Claim("isAdmin", "1"));
+
+            return NoContent();
+        }
+
+        [HttpPost("remove-admin")]
+        public async Task<ActionResult> RemoveAdmin(EditAdminDTO editAdminDTO)
+        {
+            var user = await userManager.FindByEmailAsync(editAdminDTO.Email);
+            await userManager.RemoveClaimAsync(user, new Claim("isAdmin", "1"));
+
+            return NoContent();
+        }
+
+        private async Task<ResponseAuthentication> BuildToken(UserCredentials userCredential)
         {
             var claims = new List<Claim>()
             {
                 new Claim("email", userCredential.Email)
             };
+
+            var user = await userManager.FindByEmailAsync(userCredential.Email);
+            var claimsDB = await userManager.GetClaimsAsync(user);
+
+            claims.AddRange(claimsDB);
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["keyjwt"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
