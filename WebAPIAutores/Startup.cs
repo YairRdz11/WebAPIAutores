@@ -26,7 +26,7 @@ namespace WebAPIAutores
                 .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
                 .AddNewtonsoftJson();
 
-            services.AddDbContext<ApplicationDBContext>(options => 
+            services.AddDbContext<ApplicationDBContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"))
             );
 
@@ -69,8 +69,8 @@ namespace WebAPIAutores
                         new string[] {}
                     }
                 });
-                
-             });
+
+            });
 
 
             services.AddAutoMapper(typeof(Startup));
@@ -83,6 +83,8 @@ namespace WebAPIAutores
             {
                 options.AddPolicy("IsAdmin", policy => policy.RequireClaim("isAdmin"));
             });
+
+            services.AddDataProtection();
 
             services.AddCors(options =>
             {

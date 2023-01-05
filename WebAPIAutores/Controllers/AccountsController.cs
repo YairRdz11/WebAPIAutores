@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -17,14 +18,51 @@ namespace WebAPIAutores.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<IdentityUser> signInManager;
+        private readonly IDataProtector dataProtector;
 
-        public AccountsController(UserManager<IdentityUser> userManager, IConfiguration configuration, SignInManager<IdentityUser> signInManager)
+        public AccountsController(UserManager<IdentityUser> userManager, 
+            IConfiguration configuration, SignInManager<IdentityUser> signInManager, 
+            IDataProtectionProvider dataProtectionProvider)
         {
             this.userManager = userManager;
             this.configuration = configuration;
             this.signInManager = signInManager;
+
+            dataProtector = dataProtectionProvider.CreateProtector("aA123!");
         }
 
+        [HttpGet("encrypt")]
+        public ActionResult Encrypt()
+        {
+            var plainText = "Yair Rodriguez";
+            var encryptedText = dataProtector.Protect(plainText);
+            var unenctyptedText = dataProtector.Unprotect(encryptedText);
+
+            return Ok(new
+            {
+                plainText = plainText,
+                encryptedText = encryptedText,
+                unenctyptedText = unenctyptedText
+            });
+        }
+
+        [HttpGet("encrypt-time")]
+        public ActionResult EncryptTime()
+        {
+            var protectLimitedByTime = dataProtector.ToTimeLimitedDataProtector();
+
+            var plainText = "Yair Rodriguez";
+            var encryptedText = protectLimitedByTime.Protect(plainText, lifetime: TimeSpan.FromSeconds(5));
+            Thread.Sleep(6000);
+            var unenctyptedText = dataProtector.Unprotect(encryptedText);
+
+            return Ok(new
+            {
+                plainText = plainText,
+                encryptedText = encryptedText,
+                unenctyptedText = unenctyptedText
+            });
+        }
 
         [HttpPost("register")]
         public async Task<ActionResult<ResponseAuthentication>> Register(UserCredentials userCredential)
