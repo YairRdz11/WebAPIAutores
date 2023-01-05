@@ -8,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using WebAPIAutores.DTOs;
+using WebAPIAutores.Services;
 
 namespace WebAPIAutores.Controllers
 {
@@ -18,17 +19,33 @@ namespace WebAPIAutores.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<IdentityUser> signInManager;
+        private readonly HashService hashService;
         private readonly IDataProtector dataProtector;
 
         public AccountsController(UserManager<IdentityUser> userManager, 
             IConfiguration configuration, SignInManager<IdentityUser> signInManager, 
-            IDataProtectionProvider dataProtectionProvider)
+            IDataProtectionProvider dataProtectionProvider,
+            HashService hashService)
         {
             this.userManager = userManager;
             this.configuration = configuration;
             this.signInManager = signInManager;
-
+            this.hashService = hashService;
             dataProtector = dataProtectionProvider.CreateProtector("aA123!");
+        }
+
+        [HttpGet("hash/{plainText}")]
+        public ActionResult Hash(string plainText)
+        {
+            var result1 = hashService.Hash(plainText);
+            var result2 = hashService.Hash(plainText);
+
+            return Ok(new
+            {
+                plainText = plainText,
+                hash1 = result1,
+                hash2 = result2
+            });
         }
 
         [HttpGet("encrypt")]
