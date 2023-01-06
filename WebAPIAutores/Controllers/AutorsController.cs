@@ -15,23 +15,38 @@ namespace WebAPIAutores.Controllers
     {
         private readonly ApplicationDBContext context;
         private readonly IMapper mapper;
+        private readonly IAuthorizationService authorizationService;
 
-        public AutorsController(ApplicationDBContext context, IMapper mapper)
+        public AutorsController(ApplicationDBContext context, IMapper mapper, IAuthorizationService authorizationService)
         {
             this.context = context;
             this.mapper = mapper;
+            this.authorizationService = authorizationService;
         }
 
         [HttpGet(Name = "getAutors")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<AutorDTO>>> Get()
+        public async Task<ActionResult<CollectionResources<AutorDTO>>> Get()
         {
             var autors = await context.Autors.ToListAsync();
+            var dtos = mapper.Map<List<AutorDTO>>(autors);
 
-            return mapper.Map<List<AutorDTO>>(autors);
+            var isAdmin = await authorizationService.AuthorizeAsync(User, "isAdmin");
+
+            dtos.ForEach(x => GenerateLinks(x, isAdmin.Succeeded));
+
+            var result = new CollectionResources<AutorDTO> { Values = dtos };
+            result.Links.Add(new DataHATEOAS(link: Url.Link("getAutors", new { }), description: "self", method: "GET"));
+            if (isAdmin.Succeeded)
+            {
+                result.Links.Add(new DataHATEOAS(link: Url.Link("createAutor", new { }), description: "create-autor", method: "POST"));
+            }
+
+            return result;
         }
 
         [HttpGet("{id:int}", Name = "getAutor")]
+        [AllowAnonymous]
         public async Task<ActionResult<AutorDTOWithBooks>> Get(int id)
         {
             var autor = await context.Autors
@@ -45,8 +60,9 @@ namespace WebAPIAutores.Controllers
             }
 
             var dto = mapper.Map<AutorDTOWithBooks>(autor);
+            var isAdmin = await authorizationService.AuthorizeAsync(User, "isAdmin");
 
-            GenerateLinks(dto);
+            GenerateLinks(dto, isAdmin.Succeeded);
 
             return dto;
         }
@@ -111,11 +127,15 @@ namespace WebAPIAutores.Controllers
             return NoContent();
         }
 
-        private void GenerateLinks(AutorDTO autorDTO)
+        private void GenerateLinks(AutorDTO autorDTO, bool isAdmin)
         {
             autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("getAutor", new { id = autorDTO.Id }), description: "self", method: "GET"));
-            autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("updateAutor", new { id = autorDTO.Id }), description: "create-autor", method: "PUT"));
-            autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("deleteAutor", new { id = autorDTO.Id }), description: "delet-autor", method: "DELETE"));
+
+            if (isAdmin)
+            {
+                autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("updateAutor", new { id = autorDTO.Id }), description: "create-autor", method: "PUT"));
+                autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("deleteAutor", new { id = autorDTO.Id }), description: "delet-autor", method: "DELETE"));
+            }
         }
     }
 }
