@@ -44,7 +44,11 @@ namespace WebAPIAutores.Controllers
                 return NotFound();
             }
 
-            return mapper.Map<AutorDTOWithBooks>(autor);
+            var dto = mapper.Map<AutorDTOWithBooks>(autor);
+
+            GenerateLinks(dto);
+
+            return dto;
         }
 
         [HttpGet("{name}", Name = "getAutorByName")]
@@ -105,6 +109,13 @@ namespace WebAPIAutores.Controllers
             
             await context.SaveChangesAsync();
             return NoContent();
+        }
+
+        private void GenerateLinks(AutorDTO autorDTO)
+        {
+            autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("getAutor", new { id = autorDTO.Id }), description: "self", method: "GET"));
+            autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("updateAutor", new { id = autorDTO.Id }), description: "create-autor", method: "PUT"));
+            autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("deleteAutor", new { id = autorDTO.Id }), description: "delet-autor", method: "DELETE"));
         }
     }
 }
