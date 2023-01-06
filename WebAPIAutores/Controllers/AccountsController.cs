@@ -19,69 +19,17 @@ namespace WebAPIAutores.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<IdentityUser> signInManager;
-        private readonly HashService hashService;
-        private readonly IDataProtector dataProtector;
 
         public AccountsController(UserManager<IdentityUser> userManager, 
-            IConfiguration configuration, SignInManager<IdentityUser> signInManager, 
-            IDataProtectionProvider dataProtectionProvider,
-            HashService hashService)
+            IConfiguration configuration, SignInManager<IdentityUser> signInManager)
         {
             this.userManager = userManager;
             this.configuration = configuration;
             this.signInManager = signInManager;
-            this.hashService = hashService;
-            dataProtector = dataProtectionProvider.CreateProtector("aA123!");
         }
 
-        [HttpGet("hash/{plainText}")]
-        public ActionResult Hash(string plainText)
-        {
-            var result1 = hashService.Hash(plainText);
-            var result2 = hashService.Hash(plainText);
 
-            return Ok(new
-            {
-                plainText = plainText,
-                hash1 = result1,
-                hash2 = result2
-            });
-        }
-
-        [HttpGet("encrypt")]
-        public ActionResult Encrypt()
-        {
-            var plainText = "Yair Rodriguez";
-            var encryptedText = dataProtector.Protect(plainText);
-            var unenctyptedText = dataProtector.Unprotect(encryptedText);
-
-            return Ok(new
-            {
-                plainText = plainText,
-                encryptedText = encryptedText,
-                unenctyptedText = unenctyptedText
-            });
-        }
-
-        [HttpGet("encrypt-time")]
-        public ActionResult EncryptTime()
-        {
-            var protectLimitedByTime = dataProtector.ToTimeLimitedDataProtector();
-
-            var plainText = "Yair Rodriguez";
-            var encryptedText = protectLimitedByTime.Protect(plainText, lifetime: TimeSpan.FromSeconds(5));
-            Thread.Sleep(6000);
-            var unenctyptedText = dataProtector.Unprotect(encryptedText);
-
-            return Ok(new
-            {
-                plainText = plainText,
-                encryptedText = encryptedText,
-                unenctyptedText = unenctyptedText
-            });
-        }
-
-        [HttpPost("register")]
+        [HttpPost("register", Name = "registerUser")]
         public async Task<ActionResult<ResponseAuthentication>> Register(UserCredentials userCredential)
         {
             var user = new IdentityUser { UserName = userCredential.Email, Email = userCredential.Email };
@@ -97,7 +45,7 @@ namespace WebAPIAutores.Controllers
             }
         }
 
-        [HttpPost("login")]
+        [HttpPost("login", Name = "loginUser")]
         public async Task<ActionResult<ResponseAuthentication>> Login(UserCredentials userCredentials)
         {
             var result = await signInManager.PasswordSignInAsync(userCredentials.Email, userCredentials.Password, false, false);
@@ -112,7 +60,7 @@ namespace WebAPIAutores.Controllers
             }
         }
 
-        [HttpGet("renovate-token")]
+        [HttpGet("renovate-token", Name = "renovateToken")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<ResponseAuthentication>> Renovate()
         {
@@ -126,7 +74,7 @@ namespace WebAPIAutores.Controllers
             return await BuildToken(userCredentials);
         }
 
-        [HttpPost("get-admin")]
+        [HttpPost("get-admin", Name = "getAdmin")]
         public async Task<ActionResult> GetAdmin(EditAdminDTO editAdminDTO)
         {
             var user = await userManager.FindByEmailAsync(editAdminDTO.Email);
@@ -135,7 +83,7 @@ namespace WebAPIAutores.Controllers
             return NoContent();
         }
 
-        [HttpPost("remove-admin")]
+        [HttpPost("remove-admin", Name = "revokeAdmin")]
         public async Task<ActionResult> RemoveAdmin(EditAdminDTO editAdminDTO)
         {
             var user = await userManager.FindByEmailAsync(editAdminDTO.Email);

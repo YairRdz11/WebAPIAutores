@@ -3,7 +3,7 @@ using WebAPIAutores.DTOs;
 
 namespace WebAPIAutores.Controllers
 {
-    [Route("api/")]
+    [Route("api")]
     [ApiController]
     public class RootController : ControllerBase
     {

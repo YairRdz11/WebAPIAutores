@@ -22,7 +22,7 @@ namespace WebAPIAutores.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "getAutors")]
         [AllowAnonymous]
         public async Task<ActionResult<List<AutorDTO>>> Get()
         {
@@ -47,7 +47,7 @@ namespace WebAPIAutores.Controllers
             return mapper.Map<AutorDTOWithBooks>(autor);
         }
 
-        [HttpGet("{name}")]
+        [HttpGet("{name}", Name = "getAutorByName")]
         public async Task<ActionResult<List<AutorDTO>>> Get(string name)
         {
             var autors = await context.Autors.Where(x => x.Name.Contains(name)).ToListAsync();
@@ -55,7 +55,7 @@ namespace WebAPIAutores.Controllers
             return mapper.Map<List<AutorDTO>>(autors);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "createAutor")]
         public async Task<ActionResult> Post(AutorCreationDTO autorCreationDTO)
         {
             var autorExisted = await context.Autors.AnyAsync(x => x.Name.ToLower() == autorCreationDTO.Name.ToLower());
@@ -74,7 +74,7 @@ namespace WebAPIAutores.Controllers
             return CreatedAtRoute("getAutor", new { id = autor.Id }, autorDto);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:int}", Name = "updateAutor")]
         public async Task<ActionResult> Put(int id, AutorCreationDTO autorCreationDTO)
         {
             var autorExisted = await context.Autors.AnyAsync(x => x.Id == id);
@@ -92,7 +92,7 @@ namespace WebAPIAutores.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}", Name = "deleteAutor")]
         public async Task<ActionResult> Delete(int id)
         {
             var autorExisted = await context.Autors.AnyAsync(x => x.Id == id);

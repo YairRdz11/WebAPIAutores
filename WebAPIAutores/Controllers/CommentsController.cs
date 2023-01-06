@@ -23,7 +23,7 @@ namespace WebAPIAutores.Controllers
             this.mapper = mapper;
             this.userManager = userManager;
         }
-        [HttpGet]
+        [HttpGet(Name = "getCommentsBook")]
         public async Task<ActionResult<List<CommentDTO>>> Get(int bookId)
         {
             var book = await context.Books.AnyAsync(x => x.Id == bookId);
@@ -53,7 +53,7 @@ namespace WebAPIAutores.Controllers
             return mapper.Map<CommentDTO>(comment);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "createComment")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult> Post(int bookId, CommentCreationDTO commentCreationDto)
         {
@@ -80,7 +80,7 @@ namespace WebAPIAutores.Controllers
             return CreatedAtRoute("getComment", new { id = comment.Id, bookId = bookId }, commentDto);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:int}", Name = "updateComment")]
         public async Task<ActionResult> Put(int bookId, int id, CommentCreationDTO commentCreationDTO)
         {
             var book = await context.Books.AnyAsync(x => x.Id == bookId);
