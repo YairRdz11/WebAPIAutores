@@ -24,9 +24,20 @@ namespace WebAPIAutores.Utilities
             }
 
             var result = context.Result as ObjectResult;
-            var model = result.Value as AutorDTO 
-                ?? throw new ArgumentNullException("We need an instance of AutorDTO");
-            await linksGenerator.GenerateLinks(model);
+            
+            var autorDTO = result.Value as AutorDTO;
+            if(autorDTO == null)
+            {
+                var autorsDTO = result.Value as List<AutorDTO> ?? throw new ArgumentNullException("Need to be an instance of AutorDTO or List<AutorDTO>");
+
+                autorsDTO.ForEach(async autorDTO => await linksGenerator.GenerateLinks(autorDTO));
+
+                result.Value = autorsDTO;
+            }
+            else
+            {
+                await linksGenerator.GenerateLinks(autorDTO);
+            }
             await next();
         }
     }
