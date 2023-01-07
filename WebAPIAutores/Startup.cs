@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -7,6 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json.Serialization;
 using WebAPIAutores.Services;
+using WebAPIAutores.Utilities;
 
 namespace WebAPIAutores
 {
@@ -98,6 +100,9 @@ namespace WebAPIAutores
             });
 
             services.AddTransient<HashService>();
+            services.AddTransient<LinksGenerator>();
+            services.AddTransient<HATEOASAutorFilterAttribute>();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

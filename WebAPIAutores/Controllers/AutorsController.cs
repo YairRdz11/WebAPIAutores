@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPIAutores.DTOs;
 using WebAPIAutores.Entities;
+using WebAPIAutores.Utilities;
 
 namespace WebAPIAutores.Controllers
 {
@@ -35,7 +36,7 @@ namespace WebAPIAutores.Controllers
             if (HATEOASIncluded)
             {
                 var isAdmin = await authorizationService.AuthorizeAsync(User, "isAdmin");
-                dtos.ForEach(x => GenerateLinks(x, isAdmin.Succeeded));
+                //dtos.ForEach(x => GenerateLinks(x, isAdmin.Succeeded));
                 var result = new CollectionResources<AutorDTO> { Values = dtos };
                 result.Links.Add(new DataHATEOAS(link: Url.Link("getAutors", new { }), description: "self", method: "GET"));
                 if (isAdmin.Succeeded)
@@ -52,7 +53,8 @@ namespace WebAPIAutores.Controllers
 
         [HttpGet("{id:int}", Name = "getAutor")]
         [AllowAnonymous]
-        public async Task<ActionResult<AutorDTOWithBooks>> Get(int id)
+        [ServiceFilter(typeof(HATEOASAutorFilterAttribute))]
+        public async Task<ActionResult<AutorDTOWithBooks>> Get(int id, [FromHeader] string HATEOASIncluded)
         {
             var autor = await context.Autors
                 .Include(x => x.AutorsBooks)
@@ -67,7 +69,7 @@ namespace WebAPIAutores.Controllers
             var dto = mapper.Map<AutorDTOWithBooks>(autor);
             var isAdmin = await authorizationService.AuthorizeAsync(User, "isAdmin");
 
-            GenerateLinks(dto, isAdmin.Succeeded);
+            //GenerateLinks(dto, isAdmin.Succeeded);
 
             return dto;
         }
@@ -130,17 +132,6 @@ namespace WebAPIAutores.Controllers
             
             await context.SaveChangesAsync();
             return NoContent();
-        }
-
-        private void GenerateLinks(AutorDTO autorDTO, bool isAdmin)
-        {
-            autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("getAutor", new { id = autorDTO.Id }), description: "self", method: "GET"));
-
-            if (isAdmin)
-            {
-                autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("updateAutor", new { id = autorDTO.Id }), description: "create-autor", method: "PUT"));
-                autorDTO.Links.Add(new DataHATEOAS(link: Url.Link("deleteAutor", new { id = autorDTO.Id }), description: "delet-autor", method: "DELETE"));
-            }
         }
     }
 }
