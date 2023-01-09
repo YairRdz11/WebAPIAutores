@@ -121,7 +121,8 @@ namespace WebAPIAutores
                 {
                     builder.WithOrigins("https://www.apirequest.io")
                         .AllowAnyMethod()
-                        .AllowAnyHeader();
+                        .AllowAnyHeader()
+                        .WithExposedHeaders(new string[] { "amountTotalRecord" });
                 });
             });
 
