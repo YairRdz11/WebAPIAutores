@@ -54,6 +54,7 @@ namespace WebAPIAutores
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIAutores", Version = "V1" });
                 c.SwaggerDoc("v2", new OpenApiInfo { Title = "WebAPIAutores", Version = "V2" });
                 c.OperationFilter<AddParameterHATEOAS>();
+                c.OperationFilter<AddParameterXVersion>();
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
