@@ -7,9 +7,9 @@ using WebAPIAutores.DTOs;
 using WebAPIAutores.Entities;
 using WebAPIAutores.Utilities;
 
-namespace WebAPIAutores.Controllers
+namespace WebAPIAutores.Controllers.V1
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isAdmin")]
     public class AutorsController : ControllerBase
@@ -45,7 +45,7 @@ namespace WebAPIAutores.Controllers
                 .ThenInclude(x => x.Book)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if(autor is null)
+            if (autor is null)
             {
                 return NotFound();
             }
@@ -70,7 +70,7 @@ namespace WebAPIAutores.Controllers
         public async Task<ActionResult> Post(AutorCreationDTO autorCreationDTO)
         {
             var autorExisted = await context.Autors.AnyAsync(x => x.Name.ToLower() == autorCreationDTO.Name.ToLower());
-            if(autorExisted)
+            if (autorExisted)
             {
                 return BadRequest($"The autor {autorCreationDTO.Name} already exists");
             }
@@ -113,7 +113,7 @@ namespace WebAPIAutores.Controllers
             }
 
             context.Remove(new Autor { Id = id });
-            
+
             await context.SaveChangesAsync();
             return NoContent();
         }

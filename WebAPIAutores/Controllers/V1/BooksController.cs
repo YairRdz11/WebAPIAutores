@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using WebAPIAutores.DTOs;
 using WebAPIAutores.Entities;
 
-namespace WebAPIAutores.Controllers
+namespace WebAPIAutores.Controllers.V1
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class BooksController : ControllerBase
     {
@@ -28,7 +28,7 @@ namespace WebAPIAutores.Controllers
                 .ThenInclude(x => x.Autor)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if(book == null)
+            if (book == null)
             {
                 return NotFound();
             }
@@ -41,7 +41,7 @@ namespace WebAPIAutores.Controllers
         [HttpPost(Name = "createBook")]
         public async Task<ActionResult> Post(BookCreationDTO bookCreationDto)
         {
-            if(bookCreationDto.AutorIds == null)
+            if (bookCreationDto.AutorIds == null)
             {
                 return BadRequest("You can not create a book without autors");
             }
@@ -50,7 +50,7 @@ namespace WebAPIAutores.Controllers
                 .Where(x => bookCreationDto.AutorIds.Contains(x.Id))
                 .Select(x => x.Id)
                 .ToListAsync();
-            if(autorIds.Count != bookCreationDto.AutorIds.Count)
+            if (autorIds.Count != bookCreationDto.AutorIds.Count)
             {
                 return BadRequest("One of the autors sent doesn't exist");
             }
@@ -74,7 +74,7 @@ namespace WebAPIAutores.Controllers
                 .Include(x => x.AutorsBooks)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if(bookDB == null)
+            if (bookDB == null)
             {
                 return NotFound();
             }
@@ -89,13 +89,13 @@ namespace WebAPIAutores.Controllers
         [HttpPatch("{id:int}", Name = "patchBook")]
         public async Task<ActionResult> Patch(int id, JsonPatchDocument<BookPatchDTO> patchDocument)
         {
-            if(patchDocument== null)
+            if (patchDocument == null)
             {
                 return BadRequest();
             }
 
             var bookDB = await context.Books.FirstOrDefaultAsync(x => x.Id == id);
-            if(bookDB == null)
+            if (bookDB == null)
             {
                 return NotFound();
             }
@@ -105,7 +105,7 @@ namespace WebAPIAutores.Controllers
             patchDocument.ApplyTo(bookDTO, ModelState);
             var isValid = TryValidateModel(bookDTO);
 
-            if(!isValid)
+            if (!isValid)
             {
                 return BadRequest(ModelState);
             }

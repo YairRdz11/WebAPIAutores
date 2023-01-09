@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using WebAPIAutores.DTOs;
 using WebAPIAutores.Entities;
 
-namespace WebAPIAutores.Controllers
+namespace WebAPIAutores.Controllers.V1
 {
-    [Route("api/books/{bookId:int}/[controller]")]
+    [Route("api/v1/books/{bookId:int}/[controller]/")]
     [ApiController]
     public class CommentsController : ControllerBase
     {
@@ -34,7 +34,7 @@ namespace WebAPIAutores.Controllers
             }
 
             var comments = await context.Comments
-                .Where(x=> x.BookId== bookId)
+                .Where(x => x.BookId == bookId)
                 .ToListAsync();
 
             return mapper.Map<List<CommentDTO>>(comments);
@@ -45,7 +45,7 @@ namespace WebAPIAutores.Controllers
         {
             var comment = await context.Comments.FirstOrDefaultAsync(x => x.Id == id);
 
-            if(comment == null)
+            if (comment == null)
             {
                 return NotFound();
             }
@@ -62,7 +62,7 @@ namespace WebAPIAutores.Controllers
             var user = await userManager.FindByEmailAsync(email);
             var userId = user.Id;
 
-            var book = await context.Books.AnyAsync(x =>x.Id == bookId);
+            var book = await context.Books.AnyAsync(x => x.Id == bookId);
 
             if (!book)
             {
@@ -70,14 +70,14 @@ namespace WebAPIAutores.Controllers
             }
 
             var comment = mapper.Map<Comment>(commentCreationDto);
-            comment.BookId= bookId;
-            comment.UserId= userId;
+            comment.BookId = bookId;
+            comment.UserId = userId;
             context.Add(comment);
             await context.SaveChangesAsync();
 
             var commentDto = mapper.Map<CommentDTO>(comment);
 
-            return CreatedAtRoute("getComment", new { id = comment.Id, bookId = bookId }, commentDto);
+            return CreatedAtRoute("getComment", new { id = comment.Id, bookId }, commentDto);
         }
 
         [HttpPut("{id:int}", Name = "updateComment")]
@@ -92,14 +92,14 @@ namespace WebAPIAutores.Controllers
 
             var commentExisted = await context.Comments.AnyAsync(x => x.Id == id);
 
-            if(!commentExisted)
+            if (!commentExisted)
             {
                 return NotFound();
             }
 
             var comment = mapper.Map<Comment>(commentCreationDTO);
             comment.Id = id;
-            comment.BookId= bookId;
+            comment.BookId = bookId;
             context.Update(comment);
             await context.SaveChangesAsync();
 

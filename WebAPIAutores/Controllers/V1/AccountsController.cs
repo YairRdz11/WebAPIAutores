@@ -10,9 +10,9 @@ using System.Text;
 using WebAPIAutores.DTOs;
 using WebAPIAutores.Services;
 
-namespace WebAPIAutores.Controllers
+namespace WebAPIAutores.Controllers.V1
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class AccountsController : ControllerBase
     {
@@ -20,7 +20,7 @@ namespace WebAPIAutores.Controllers
         private readonly IConfiguration configuration;
         private readonly SignInManager<IdentityUser> signInManager;
 
-        public AccountsController(UserManager<IdentityUser> userManager, 
+        public AccountsController(UserManager<IdentityUser> userManager,
             IConfiguration configuration, SignInManager<IdentityUser> signInManager)
         {
             this.userManager = userManager;
@@ -38,7 +38,7 @@ namespace WebAPIAutores.Controllers
             if (result.Succeeded)
             {
                 return await BuildToken(userCredential);
-            } 
+            }
             else
             {
                 return BadRequest(result.Errors);
