@@ -25,7 +25,10 @@ namespace WebAPIAutores
         {
             // Add services to the container.
 
-            services.AddControllers()
+            services.AddControllers(options =>
+            {
+                options.Conventions.Add(new SwaggerGroupByVersion());
+            })
                 .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
                 .AddNewtonsoftJson();
 
@@ -49,6 +52,7 @@ namespace WebAPIAutores
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIAutores", Version = "V1" });
+                c.SwaggerDoc("v2", new OpenApiInfo { Title = "WebAPIAutores", Version = "V2" });
                 c.OperationFilter<AddParameterHATEOAS>();
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -111,9 +115,15 @@ namespace WebAPIAutores
             // Configure the HTTP request pipeline.
             if (env.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIAutores v1");
+                c.SwaggerEndpoint("/swagger/v2/swagger.json", "WebAPIAutores v2");
+            });
 
             app.UseHttpsRedirection();
 
