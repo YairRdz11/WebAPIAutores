@@ -26,7 +26,7 @@ namespace WebAPIAutores.Controllers.V1
             this.authorizationService = authorizationService;
         }
 
-        [HttpGet(Name = "getAutors")]
+        [HttpGet(Name = "getAutorsv1")]
         [AllowAnonymous]
         [ServiceFilter(typeof(HATEOASAutorFilterAttribute))]
         public async Task<ActionResult<List<AutorDTO>>> Get()
@@ -36,7 +36,7 @@ namespace WebAPIAutores.Controllers.V1
             return mapper.Map<List<AutorDTO>>(autors);
         }
 
-        [HttpGet("{id:int}", Name = "getAutor")]
+        [HttpGet("{id:int}", Name = "getAutorv1")]
         [AllowAnonymous]
         [ServiceFilter(typeof(HATEOASAutorFilterAttribute))]
         public async Task<ActionResult<AutorDTOWithBooks>> Get(int id)
@@ -59,7 +59,7 @@ namespace WebAPIAutores.Controllers.V1
             return dto;
         }
 
-        [HttpGet("{name}", Name = "getAutorByName")]
+        [HttpGet("{name}", Name = "getAutorByNamev1")]
         public async Task<ActionResult<List<AutorDTO>>> GetByName(string name)
         {
             var autors = await context.Autors.Where(x => x.Name.Contains(name)).ToListAsync();
@@ -67,7 +67,7 @@ namespace WebAPIAutores.Controllers.V1
             return mapper.Map<List<AutorDTO>>(autors);
         }
 
-        [HttpPost(Name = "createAutor")]
+        [HttpPost(Name = "createAutorv1")]
         public async Task<ActionResult> Post(AutorCreationDTO autorCreationDTO)
         {
             var autorExisted = await context.Autors.AnyAsync(x => x.Name.ToLower() == autorCreationDTO.Name.ToLower());
@@ -83,10 +83,10 @@ namespace WebAPIAutores.Controllers.V1
 
             var autorDto = mapper.Map<AutorDTO>(autor);
 
-            return CreatedAtRoute("getAutor", new { id = autor.Id }, autorDto);
+            return CreatedAtRoute("getAutorv1", new { id = autor.Id }, autorDto);
         }
 
-        [HttpPut("{id:int}", Name = "updateAutor")]
+        [HttpPut("{id:int}", Name = "updateAutorv1")]
         public async Task<ActionResult> Put(int id, AutorCreationDTO autorCreationDTO)
         {
             var autorExisted = await context.Autors.AnyAsync(x => x.Id == id);
@@ -104,7 +104,7 @@ namespace WebAPIAutores.Controllers.V1
             return NoContent();
         }
 
-        [HttpDelete("{id:int}", Name = "deleteAutor")]
+        [HttpDelete("{id:int}", Name = "deleteAutorv1")]
         public async Task<ActionResult> Delete(int id)
         {
             var autorExisted = await context.Autors.AnyAsync(x => x.Id == id);

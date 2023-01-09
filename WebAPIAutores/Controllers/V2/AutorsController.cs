@@ -10,7 +10,7 @@ using WebAPIAutores.Utilities;
 namespace WebAPIAutores.Controllers.V2
 {
     [Route("api/[controller]")]
-    [HeaderIsPresent("x-version", "1")]
+    [HeaderIsPresent("x-version", "2")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "isAdmin")]
     public class AutorsController : ControllerBase
@@ -33,7 +33,7 @@ namespace WebAPIAutores.Controllers.V2
         {
             var autors = await context.Autors.ToListAsync();
 
-            autors.ForEach(x => x.Name.ToUpper());
+            autors.ForEach(x => x.Name = x.Name.ToUpper());
 
             return mapper.Map<List<AutorDTO>>(autors);
         }
