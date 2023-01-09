@@ -1,15 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using WebAPIAutores.Services;
 using WebAPIAutores.Utilities;
 
+[assembly: ApiConventionType(typeof(DefaultApiConventions))]
 namespace WebAPIAutores
 {
     public class Startup
@@ -51,7 +54,20 @@ namespace WebAPIAutores
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIAutores", Version = "V1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { 
+                    Title = "WebAPIAutores", 
+                    Version = "V1",
+                    Description = "This is a web api for working with autors and books",
+                    Contact = new OpenApiContact
+                    {
+                        Email = "yairrdz11@gmail.com",
+                        Name= "Yair Rodríguez",
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name="MIT"
+                    }
+                });
                 c.SwaggerDoc("v2", new OpenApiInfo { Title = "WebAPIAutores", Version = "V2" });
                 c.OperationFilter<AddParameterHATEOAS>();
                 c.OperationFilter<AddParameterXVersion>();
@@ -63,7 +79,7 @@ namespace WebAPIAutores
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header
                 });
-
+                    
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
@@ -79,6 +95,10 @@ namespace WebAPIAutores
                     }
                 });
 
+                var fileXLM = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
+                var pathXML = Path.Combine(AppContext.BaseDirectory, fileXLM);
+
+                c.IncludeXmlComments(pathXML);
             });
 
 
